@@ -23,7 +23,7 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package.json ./
 
-RUN apt-get update
-RUN apt-get install -y libnss3
+RUN apt update
+RUN apt install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgbm1 libasound2 libpangocairo-1.0-0 libxss1 libgtk-3-0
 
 CMD ["yarn", "start"]
