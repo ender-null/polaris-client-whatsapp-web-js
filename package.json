@@ -47,6 +47,7 @@
     "wwebjs-mongo": "^1.1.0"
   },
   "devDependencies": {
+    "@types/qrcode": "^1.5.5",
     "@types/node": "^20.12.2",
     "@types/node-telegram-bot-api": "^0.64.6",
     "@types/ws": "^8.5.10",
