@@ -108,10 +108,14 @@ export class Bot {
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
-  async sendChatAction(conversationId: number | string, type = 'text'): Promise<void> {
-    const chatId = String(conversationId).startsWith('-')
+  formatChatId(conversationId: number | string) {
+    return String(conversationId).startsWith('-')
       ? `${String(conversationId).slice(1)}@g.us`
       : `${conversationId}@c.us`;
+  }
+
+  async sendChatAction(conversationId: number | string, type = 'text'): Promise<void> {
+    const chatId = this.formatChatId(conversationId);
     const chat = await this.client.getChatById(chatId);
     if (type == 'voice' || type == 'audio') {
       chat.sendStateRecording();
@@ -126,9 +130,7 @@ export class Bot {
   async sendMessage(msg: Message): Promise<WAWebJS.Message> {
     await this.client.sendPresenceAvailable()
     this.sendChatAction(msg.conversation.id, msg.type);
-    const number = String(msg.conversation.id).startsWith('-')
-      ? `${String(msg.conversation.id).slice(1)}@g.us`
-      : `${msg.conversation.id}@c.us`;
+    const chatId = this.formatChatId(msg.conversation.id);
     if (msg.type == 'text') {
       if (!msg.content || (typeof msg.content == 'string' && msg.content.length == 0)) {
         return null;
@@ -145,7 +147,7 @@ export class Bot {
         linkPreview: preview,
       });
     } else if (msg.type == 'photo') {
-      this.client.sendMessage(number, await this.getInputFile(msg.content), {
+      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
         caption: msg.extra?.caption,
       });
     }
