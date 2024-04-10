@@ -93,7 +93,9 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
     //await bot.init()
   });
 
-  ws.on('close', (code) => {
+  ws.on('close', async (code) => {
+    await client.sendPresenceUnavailable()
+    await client.setStatus('Offline')
     if (code === 1005) {
       logger.warn(`Disconnected`);
     } else if (code === 1006) {

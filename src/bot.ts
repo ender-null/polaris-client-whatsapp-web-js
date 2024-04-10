@@ -31,6 +31,8 @@ export class Bot {
       user: this.user,
       config,
     };
+    await this.client.sendPresenceAvailable()
+    await this.client.setStatus(`Listening ${config.prefix}help`)
     this.websocket.send(JSON.stringify(data, null, 4));
     logger.info(`Connected as @${data.user.username}`);
   }
