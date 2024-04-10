@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import WebSocket from 'ws';
 import { Conversation, Extra, Message, User, WSInit, WSPing } from './types';
 import { Config } from './config';
@@ -67,6 +68,9 @@ export class Bot {
     if (msg.type === MessageTypes.TEXT) {
       content = msg.body;
       type = 'text';
+      if (msg.mentionedIds.length) {
+        extra.mentions = msg.mentionedIds
+      }
     } else if (msg.type === MessageTypes.IMAGE) {
       const media = await msg.downloadMedia();
       content = media.filename;
@@ -143,8 +147,12 @@ export class Bot {
       if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
         text = htmlToMarkdown(text);
       }
-      this.client.sendMessage(number, text, {
+      const result = text.matchAll(/@\d+/gim)
+      const mentionsFound = [...result][0]
+      const mentions: any[] = mentionsFound?.map(mention => `${mention.slice(1)}@c.us`)
+      this.client.sendMessage(chatId, text, {
         linkPreview: preview,
+        mentions: mentions
       });
     } else if (msg.type == 'photo') {
       this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
