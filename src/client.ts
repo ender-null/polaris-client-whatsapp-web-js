@@ -49,7 +49,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
   });
 
   client.on('qr', async (qr_code) => {
-    const qr = QRCode.toString(qr_code, {
+    const qr = await QRCode.toString(qr_code, {
       type: 'terminal',
     });
     logger.info(`QR received:\n${qr}`);
