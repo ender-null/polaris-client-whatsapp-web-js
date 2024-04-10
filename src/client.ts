@@ -36,9 +36,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
       store: store,
       backupSyncIntervalMs: 300000,
     }),*/
-    // proxyAuthentication: { username: 'username', password: 'password' },
     puppeteer: {
-      // args: ['--proxy-server=proxy-server-that-requires-authentication.example.com'],
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--unhandled-rejections=strict'],
     },
@@ -51,6 +49,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
   client.on('qr', async (qr_code) => {
     const qr = await QRCode.toString(qr_code, {
       type: 'terminal',
+      small: true
     });
     logger.info(`QR received:\n${qr}`);
   });
