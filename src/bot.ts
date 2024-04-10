@@ -157,7 +157,7 @@ export class Bot {
     if (content.startsWith('/') || content.startsWith('C:\\')) {
       return MessageMedia.fromFilePath(content);
     } else if (content.startsWith('http')) {
-      return await MessageMedia.fromUrl(content);
+      return await MessageMedia.fromUrl(content, { unsafeMime: true });
     } else {
       return null;
     }
