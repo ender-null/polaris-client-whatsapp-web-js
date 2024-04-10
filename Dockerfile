@@ -23,4 +23,7 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package.json ./
 
+RUN apt-get update
+RUN apt-get install -y libnss3
+
 CMD ["yarn", "start"]
