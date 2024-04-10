@@ -3,9 +3,9 @@ import WebSocket from 'ws';
 import { Bot } from './bot';
 import { WSMessage } from './types';
 import { catchException, logger } from './utils';
-import { Client, RemoteAuth } from 'whatsapp-web.js';
-import { MongoStore } from 'wwebjs-mongo';
+import { Client, LocalAuth } from 'whatsapp-web.js';
 import mongoose from 'mongoose';
+import QRCode from 'qrcode';
 
 let bot: Bot;
 let ws: WebSocket;
@@ -13,6 +13,7 @@ let pingInterval;
 
 logger.debug(`SERVER: ${process.env.SERVER}`);
 logger.debug(`CONFIG: ${process.env.CONFIG}`);
+logger.debug(`MONGODB_URI: ${process.env.MONGODB_URI}`);
 
 const close = () => {
   logger.warn(`Close server`);
@@ -27,22 +28,30 @@ process.on('exit', () => {
 });
 
 mongoose.connect(process.env.MONGODB_URI).then(() => {
-  const store = new MongoStore({ mongoose: mongoose });
+  // const store = new MongoStore({ mongoose: mongoose });
+  const wwebVersion = '2.2412.54';
   const client = new Client({
-    authStrategy: new RemoteAuth({
+    authStrategy: new LocalAuth(),
+    /*authStrategy: new RemoteAuth({
       store: store,
       backupSyncIntervalMs: 300000,
-    }),
+    }),*/
     // proxyAuthentication: { username: 'username', password: 'password' },
     puppeteer: {
       // args: ['--proxy-server=proxy-server-that-requires-authentication.example.com'],
-      headless: false,
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--unhandled-rejections=strict'],
+    },
+    webVersionCache: {
+      type: 'remote',
+      remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
     },
   });
 
-  client.on('qr', (qr) => {
+  client.on('qr', async (qr_code) => {
     // Generate and scan this code with your phone
-    logger.info('QR RECEIVED');
+    logger.info(`QR received: ${qr_code}`);
+    const qr = await QRCode.toDataURL(qr_code, { type: 'terminal' });
     logger.info(qr);
   });
 
@@ -55,7 +64,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
     const msg = await bot.convertMessage(message);
     const data: WSMessage = {
       bot: bot.user.username,
-      platform: 'telegram',
+      platform: 'whatsapp',
       type: 'message',
       message: msg,
     };

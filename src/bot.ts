@@ -1,9 +1,8 @@
 import WebSocket from 'ws';
 import { Conversation, Extra, Message, User, WSInit, WSPing } from './types';
 import { Config } from './config';
-import { isInt, logger } from './utils';
-import { Stream } from 'node:stream';
-import WAWebJS, { Client, MessageTypes } from 'whatsapp-web.js';
+import { htmlToMarkdown, logger } from './utils';
+import WAWebJS, { Client, MessageMedia, MessageTypes } from 'whatsapp-web.js';
 
 export class Bot {
   user: User;
@@ -27,7 +26,7 @@ export class Bot {
     const config: Config = JSON.parse(process.env.CONFIG);
     const data: WSInit = {
       bot: this.user.username,
-      platform: 'telegram',
+      platform: 'whatsapp',
       type: 'init',
       user: this.user,
       config,
@@ -39,8 +38,8 @@ export class Bot {
   ping() {
     logger.debug('ping');
     const data: WSPing = {
-      bot: this.user.username,
-      platform: 'telegram',
+      bot: this.user?.username,
+      platform: 'whatsapp',
       type: 'ping',
     };
     this.websocket.send(JSON.stringify(data, null, 4));
@@ -49,13 +48,16 @@ export class Bot {
   async convertMessage(msg: WAWebJS.Message) {
     const id: string = msg.id.id;
     const extra: Extra = {
-      originalMessage: msg,
+      // originalMessage: msg,
     };
     const chat = await msg.getChat();
-    const conversation = new Conversation(chat.id.user, chat.name);
     const contact = await msg.getContact();
-    const sender = new User(contact.id.user, contact.pushname, null, contact.id.user, false);
+    chat.sendSeen();
 
+    const conversation = chat.isGroup
+      ? new Conversation(`-${chat.id.user}`, chat.name)
+      : new Conversation(chat.id.user, contact.pushname);
+    const sender = new User(contact.id.user, contact.pushname, null, contact.id.user, false);
     let content;
     let type;
 
@@ -103,19 +105,26 @@ export class Bot {
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
-  async sendChatAction(msg: WAWebJS.Message, type = 'text'): Promise<void> {
-    const chat = await msg.getChat();
+  async sendChatAction(conversationId: number | string, type = 'text'): Promise<void> {
+    const chatId = String(conversationId).startsWith('-')
+      ? `${String(conversationId).slice(1)}@g.us`
+      : `${conversationId}@c.us`;
+    const chat = await this.client.getChatById(chatId);
     if (type == 'voice' || type == 'audio') {
       chat.sendStateRecording();
     } else if (type == 'cancel') {
       chat.clearState();
     } else {
       chat.sendStateTyping();
+      chat.sendSeen();
     }
   }
 
   async sendMessage(msg: Message): Promise<WAWebJS.Message> {
-    this.sendChatAction(msg.extra.originalMessage, msg.type);
+    this.sendChatAction(msg.conversation.id, msg.type);
+    const number = String(msg.conversation.id).startsWith('-')
+      ? `${String(msg.conversation.id).slice(1)}@g.us`
+      : `${msg.conversation.id}@c.us`;
     if (msg.type == 'text') {
       if (!msg.content || (typeof msg.content == 'string' && msg.content.length == 0)) {
         return null;
@@ -124,26 +133,29 @@ export class Bot {
       if (msg.extra && 'preview' in msg.extra) {
         preview = msg.extra.preview;
       }
-      this.client.sendMessage(String(msg.conversation.id), msg.content, {
+      let text = msg.content;
+      if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
+        text = htmlToMarkdown(text);
+      }
+      this.client.sendMessage(number, text, {
         linkPreview: preview,
+      });
+    } else if (msg.type == 'photo') {
+      this.client.sendMessage(number, await this.getInputFile(msg.content), {
         caption: msg.extra?.caption,
       });
     }
-
-    this.sendChatAction(msg.extra.originalMessage, 'cancel');
-
+    this.sendChatAction(msg.conversation.id, 'cancel');
     return null;
   }
 
-  getInputFile(content: string): string | Stream | Buffer {
+  async getInputFile(content: string): Promise<WAWebJS.MessageMedia> {
     if (content.startsWith('/') || content.startsWith('C:\\')) {
-      return Buffer.from(content);
+      return MessageMedia.fromFilePath(content);
     } else if (content.startsWith('http')) {
-      return content;
-    } else if (isInt(content)) {
-      return content;
+      return await MessageMedia.fromUrl(content);
     } else {
-      return content;
+      return null;
     }
   }
 }
