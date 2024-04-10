@@ -48,6 +48,7 @@ export class Bot {
   }
 
   async convertMessage(msg: WAWebJS.Message) {
+    await this.client.sendPresenceAvailable()
     const id: string = msg.id.id;
     const extra: Extra = {
       // originalMessage: msg,
@@ -123,6 +124,7 @@ export class Bot {
   }
 
   async sendMessage(msg: Message): Promise<WAWebJS.Message> {
+    await this.client.sendPresenceAvailable()
     this.sendChatAction(msg.conversation.id, msg.type);
     const number = String(msg.conversation.id).startsWith('-')
       ? `${String(msg.conversation.id).slice(1)}@g.us`
