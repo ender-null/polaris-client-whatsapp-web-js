@@ -140,6 +140,7 @@ export class Bot {
     if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
       caption = htmlToMarkdown(msg.extra?.caption);
     }
+    caption = caption.trim()
     const quotedMessageId = msg.reply ? String(msg.reply.id) : null;
 
     if (msg.type == 'text') {
@@ -154,6 +155,7 @@ export class Bot {
       if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
         text = htmlToMarkdown(text);
       }
+      text = text.trim()
       const result = text.matchAll(/@\d+/gim);
       const mentionsFound = [...result][0];
       const mentions: any[] = mentionsFound?.map((mention) => `${mention.slice(1)}@c.us`);
