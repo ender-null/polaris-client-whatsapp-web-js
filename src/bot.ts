@@ -140,7 +140,7 @@ export class Bot {
     if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
       caption = htmlToMarkdown(msg.extra?.caption);
     }
-    caption = caption.trim()
+    caption = caption?.trim()
     const quotedMessageId = msg.reply ? String(msg.reply.id) : null;
 
     if (msg.type == 'text') {
