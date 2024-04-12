@@ -32,8 +32,8 @@ export class Bot {
       user: this.user,
       config,
     };
-    await this.client.sendPresenceAvailable()
-    await this.client.setStatus(`${config.prefix}help`)
+    await this.client.sendPresenceAvailable();
+    await this.client.setStatus(`${config.prefix}help`);
     this.websocket.send(JSON.stringify(data, null, 4));
     logger.info(`Connected as @${data.user.username}`);
   }
@@ -49,8 +49,8 @@ export class Bot {
   }
 
   async convertMessage(msg: WAWebJS.Message) {
-    await this.client.sendPresenceAvailable()
-    const id: string = msg.id.id;
+    await this.client.sendPresenceAvailable();
+    const id: string = msg.id._serialized;
     const extra: Extra = {
       // originalMessage: msg,
     };
@@ -69,7 +69,7 @@ export class Bot {
       content = msg.body;
       type = 'text';
       if (msg.mentionedIds.length) {
-        extra.mentions = msg.mentionedIds
+        extra.mentions = msg.mentionedIds;
       }
     } else if (msg.type === MessageTypes.IMAGE) {
       const media = await msg.downloadMedia();
@@ -132,9 +132,16 @@ export class Bot {
   }
 
   async sendMessage(msg: Message): Promise<WAWebJS.Message> {
-    await this.client.sendPresenceAvailable()
+    await this.client.sendPresenceAvailable();
     this.sendChatAction(msg.conversation.id, msg.type);
     const chatId = this.formatChatId(msg.conversation.id);
+
+    let caption = msg.extra?.caption;
+    if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
+      caption = htmlToMarkdown(msg.extra?.caption);
+    }
+    const quotedMessageId = msg.reply ? String(msg.reply.id) : null;
+
     if (msg.type == 'text') {
       if (!msg.content || (typeof msg.content == 'string' && msg.content.length == 0)) {
         return null;
@@ -147,16 +154,18 @@ export class Bot {
       if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
         text = htmlToMarkdown(text);
       }
-      const result = text.matchAll(/@\d+/gim)
-      const mentionsFound = [...result][0]
-      const mentions: any[] = mentionsFound?.map(mention => `${mention.slice(1)}@c.us`)
+      const result = text.matchAll(/@\d+/gim);
+      const mentionsFound = [...result][0];
+      const mentions: any[] = mentionsFound?.map((mention) => `${mention.slice(1)}@c.us`);
       this.client.sendMessage(chatId, text, {
         linkPreview: preview,
-        mentions: mentions
+        mentions: mentions,
+        quotedMessageId,
       });
     } else if (msg.type == 'photo') {
       this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
-        caption: msg.extra?.caption,
+        caption,
+        quotedMessageId,
       });
     }
     this.sendChatAction(msg.conversation.id, 'cancel');
