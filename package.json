@@ -37,7 +37,7 @@
     "node": ">=12"
   },
   "dependencies": {
-    "file-type": "^19.0.0",
+    "file-type": "^16.5.4",
     "mongoose": "^8.3.1",
     "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0",
