@@ -182,7 +182,7 @@ export class Bot {
     } else if (content.startsWith('http')) {
       return await MessageMedia.fromUrl(content, { unsafeMime: true });
     } else {
-      return content;
+      return null;
     }
   }
 }
