@@ -176,13 +176,13 @@ export class Bot {
   }
 
   async getInputFile(content: string): Promise<WAWebJS.MessageMedia> {
-    if (content.startsWith('/') || content.startsWith('C:\\')) {
-      return MessageMedia.fromFilePath(content);
+    if (content.startsWith('/')) {
+      const file: FileResult = await fromBase64(content);
+      return MessageMedia.fromFilePath(file.name);
     } else if (content.startsWith('http')) {
       return await MessageMedia.fromUrl(content, { unsafeMime: true });
     } else {
-      const file: FileResult = await fromBase64(content);
-      return MessageMedia.fromFilePath(file.name);
+      return content;
     }
   }
 }
