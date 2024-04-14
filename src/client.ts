@@ -93,8 +93,10 @@ ws.on('open', async () => {
 });
 
 ws.on('close', async (code) => {
-  await client.sendPresenceUnavailable();
-  await client.setStatus('Offline');
+  if (client.pupPage) {
+    await client.sendPresenceUnavailable();
+    await client.setStatus('Offline');
+  }
   if (code === 1005) {
     logger.warn(`Disconnected`);
   } else if (code === 1006) {
