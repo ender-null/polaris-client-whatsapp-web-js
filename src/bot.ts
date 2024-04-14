@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import WebSocket from 'ws';
+import WAWebJS, { Client, MessageMedia, MessageTypes } from 'whatsapp-web.js';
+import { FileResult } from 'tmp';
 import { Conversation, Extra, Message, User, WSInit, WSPing } from './types';
 import { Config } from './config';
-import { htmlToMarkdown, logger } from './utils';
-import WAWebJS, { Client, MessageMedia, MessageTypes } from 'whatsapp-web.js';
+import { fromBase64, htmlToMarkdown, logger } from './utils';
 
 export class Bot {
   user: User;
@@ -140,7 +141,7 @@ export class Bot {
     if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
       caption = htmlToMarkdown(msg.extra?.caption);
     }
-    caption = caption?.trim()
+    caption = caption?.trim();
     const quotedMessageId = msg.reply ? String(msg.reply.id) : null;
 
     if (msg.type == 'text') {
@@ -155,7 +156,7 @@ export class Bot {
       if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
         text = htmlToMarkdown(text);
       }
-      text = text.trim()
+      text = text.trim();
       const result = text.matchAll(/@\d+/gim);
       const mentionsFound = [...result][0];
       const mentions: any[] = mentionsFound?.map((mention) => `${mention.slice(1)}@c.us`);
@@ -180,7 +181,8 @@ export class Bot {
     } else if (content.startsWith('http')) {
       return await MessageMedia.fromUrl(content, { unsafeMime: true });
     } else {
-      return null;
+      const file: FileResult = await fromBase64(content);
+      return MessageMedia.fromFilePath(file.name);
     }
   }
 }
