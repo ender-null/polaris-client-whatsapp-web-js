@@ -170,7 +170,37 @@ export class Bot {
         caption,
         quotedMessageId,
       });
+    } else if (msg.type == 'video') {
+      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+        caption,
+        quotedMessageId,
+      });
+    } else if (msg.type == 'animation') {
+      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+        caption,
+        quotedMessageId,
+        sendVideoAsGif: true,
+      });
+    } else if (msg.type == 'voice' || msg.type == 'audio') {
+      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+        caption,
+        quotedMessageId,
+        sendAudioAsVoice: true,
+      });
+    } else if (msg.type == 'document') {
+      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+        caption,
+        quotedMessageId,
+        sendMediaAsDocument: true,
+      });
+    } else if (msg.type == 'sticker') {
+      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+        caption,
+        quotedMessageId,
+        sendMediaAsSticker: true,
+      });
     }
+
     this.sendChatAction(msg.conversation.id, 'cancel');
     return null;
   }
