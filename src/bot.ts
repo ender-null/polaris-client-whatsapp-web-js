@@ -144,6 +144,11 @@ export class Bot {
     caption = caption?.trim();
     const quotedMessageId = msg.reply ? String(msg.reply.id) : null;
 
+    let media;
+    if (msg.type !== 'text') {
+      media = await this.getInputFile(msg.content);
+    }
+
     if (msg.type == 'text') {
       if (!msg.content || (typeof msg.content == 'string' && msg.content.length == 0)) {
         return null;
@@ -165,39 +170,44 @@ export class Bot {
         mentions: mentions,
         quotedMessageId,
       });
-    } else if (msg.type == 'photo') {
-      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
-        caption,
-        quotedMessageId,
-      });
-    } else if (msg.type == 'video') {
-      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
-        caption,
-        quotedMessageId,
-      });
     } else if (msg.type == 'animation') {
-      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+      this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
+        media,
         sendVideoAsGif: true,
       });
     } else if (msg.type == 'voice' || msg.type == 'audio') {
-      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+      this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
+        media,
         sendAudioAsVoice: true,
       });
     } else if (msg.type == 'document') {
-      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+      this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
+        media,
         sendMediaAsDocument: true,
       });
     } else if (msg.type == 'sticker') {
-      this.client.sendMessage(chatId, await this.getInputFile(msg.content), {
+      this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
+        media,
         sendMediaAsSticker: true,
+      });
+    } else if (msg.type == 'video') {
+      this.client.sendMessage(chatId, media, {
+        caption,
+        quotedMessageId,
+        media,
+      });
+    } else {
+      this.client.sendMessage(chatId, msg.content, {
+        caption,
+        quotedMessageId,
       });
     }
 
