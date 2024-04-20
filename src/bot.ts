@@ -4,7 +4,7 @@ import WAWebJS, { Client, MessageMedia, MessageTypes } from 'whatsapp-web.js';
 import { FileResult } from 'tmp';
 import { Conversation, Extra, Message, User, WSInit, WSPing } from './types';
 import { Config } from './config';
-import { fromBase64, htmlToMarkdown, logger } from './utils';
+import { fromBase64, htmlToWhatsAppMarkdown, logger } from './utils';
 
 export class Bot {
   user: User;
@@ -34,7 +34,6 @@ export class Bot {
       config,
     };
     await this.client.sendPresenceAvailable();
-    await this.client.setStatus(`${config.prefix}help`);
     this.websocket.send(JSON.stringify(data, null, 4));
     logger.info(`Connected as @${data.user.username}`);
   }
@@ -139,7 +138,7 @@ export class Bot {
 
     let caption = msg.extra?.caption;
     if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
-      caption = htmlToMarkdown(msg.extra?.caption);
+      caption = htmlToWhatsAppMarkdown(msg.extra?.caption);
     }
     caption = caption?.trim();
     const quotedMessageId = msg.reply ? String(msg.reply.id) : null;
@@ -159,7 +158,7 @@ export class Bot {
       }
       let text = msg.content;
       if (msg.extra && msg.extra.format && msg.extra.format === 'HTML') {
-        text = htmlToMarkdown(text);
+        text = htmlToWhatsAppMarkdown(text);
       }
       text = text.trim();
       const result = text.matchAll(/@\d+/gim);

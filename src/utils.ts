@@ -17,9 +17,9 @@ export const replaceHtml = (text: string): string => {
   return text;
 };
 
-export const htmlToMarkdown = (text: string): string => {
+export const htmlToWhatsAppMarkdown = (text: string): string => {
   if (text) {
-    text = text.replace(new RegExp('<a href="(.*?)">(.*?)</a>', 'gim'), '[$2]($1)');
+    text = text.replace(new RegExp('<a href="(.*?)">(.*?)</a>', 'gim'), '$1');
     text = text.replace(new RegExp('<i>(.*?)</i>', 'gim'), '_$1_');
     text = text.replace(new RegExp('<b>(.*?)</b>', 'gim'), '*$1*');
     text = text.replace(new RegExp('<u>(.*?)</u>', 'gim'), '~$1~');
