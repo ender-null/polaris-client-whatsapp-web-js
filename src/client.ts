@@ -95,7 +95,6 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
   ws.on('close', async (code) => {
     if (client.pupPage) {
       await client.sendPresenceUnavailable();
-      await client.setStatus('Offline');
     }
     if (code === 1005) {
       logger.warn(`Disconnected`);
@@ -109,7 +108,9 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
   ws.on('message', (data: string) => {
     try {
       const msg = JSON.parse(data);
-      logger.info(JSON.stringify(msg, null, 4));
+      if (msg.type !== 'pong') {
+        logger.info(JSON.stringify(msg, null, 4));
+      }
       if (msg.type === 'message') {
         bot.sendMessage(msg.message);
       }

@@ -169,6 +169,12 @@ export class Bot {
         mentions: mentions,
         quotedMessageId,
       });
+    } else if (msg.type == 'photo') {
+      this.client.sendMessage(chatId, media, {
+        caption,
+        quotedMessageId,
+        media,
+      });
     } else if (msg.type == 'animation') {
       this.client.sendMessage(chatId, media, {
         caption,
