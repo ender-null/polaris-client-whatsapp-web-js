@@ -40,12 +40,14 @@ export class Bot {
 
   ping() {
     logger.debug('ping');
-    const data: WSPing = {
-      bot: this.user?.username,
-      platform: 'whatsapp',
-      type: 'ping',
-    };
-    this.websocket.send(JSON.stringify(data, null, 4));
+    if (this.user) {
+      const data: WSPing = {
+        bot: this.user.username,
+        platform: 'whatsapp',
+        type: 'ping',
+      };
+      this.websocket.send(JSON.stringify(data, null, 4));
+    }
   }
 
   async convertMessage(msg: WAWebJS.Message) {
