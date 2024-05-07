@@ -25,7 +25,7 @@ export const htmlToWhatsAppMarkdown = (text: string): string => {
     text = text.replace(new RegExp('<u>(.*?)</u>', 'gim'), '~$1~');
     text = text.replace(new RegExp('<code>(.*?)</code>', 'gim'), '`$1`');
     text = text.replace(new RegExp('<pre>(.*?)</pre>', 'gim'), '```$1```');
-    text = text.replace(new RegExp('<blockquote>(.*?)</blockquote>', 'gim'), (p1) => {
+    text = text.replace(new RegExp('<blockquote>(.*?)</blockquote>', 'gim'), (_, p1) => {
       return '> ' + p1.replace(/\n/g, '\n> ');
     });
 
