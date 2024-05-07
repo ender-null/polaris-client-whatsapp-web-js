@@ -175,41 +175,35 @@ export class Bot {
       this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
-        media,
       });
     } else if (msg.type == 'animation') {
       this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
-        media,
         sendVideoAsGif: true,
       });
     } else if (msg.type == 'voice' || msg.type == 'audio') {
       this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
-        media,
         sendAudioAsVoice: true,
       });
     } else if (msg.type == 'document') {
       this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
-        media,
         sendMediaAsDocument: true,
       });
     } else if (msg.type == 'sticker') {
       this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
-        media,
         sendMediaAsSticker: true,
       });
     } else if (msg.type == 'video') {
       this.client.sendMessage(chatId, media, {
         caption,
         quotedMessageId,
-        media,
       });
     } else {
       this.client.sendMessage(chatId, msg.content, {
