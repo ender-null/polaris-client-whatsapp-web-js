@@ -37,7 +37,7 @@
     "node": ">=12"
   },
   "dependencies": {
-    "file-type": "^19.0.0",
+    "file-type": "^16.5.4",
     "mongoose": "^8.3.4",
     "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0",
@@ -50,7 +50,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.10",
-    "@types/node-telegram-bot-api": "^0.64.6",
     "@types/qrcode": "^1.5.5",
     "@types/tmp": "^0.2.6",
     "@types/ws": "^8.5.10",
