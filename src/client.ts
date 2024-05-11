@@ -12,10 +12,6 @@ let bot: Bot;
 let ws: WebSocket;
 let pingInterval;
 
-logger.debug(`SERVER: ${process.env.SERVER}`);
-logger.debug(`CONFIG: ${process.env.CONFIG}`);
-logger.debug(`MONGODB_URI: ${process.env.MONGODB_URI}`);
-
 const close = () => {
   logger.warn(`Close server`);
   ws.terminate();
