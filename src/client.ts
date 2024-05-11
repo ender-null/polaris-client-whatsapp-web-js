@@ -28,6 +28,19 @@ process.on('exit', () => {
   logger.warn(`Exit process`);
 });
 
+if (!process.env.SERVER || process.env.MONGODB_URI || process.env.CONFIG) {
+  if (!process.env.SERVER) {
+    logger.warn(`Missing env variable SERVER`);
+  }
+  if (!process.env.CONFIG) {
+    logger.warn(`Missing env variable CONFIG`);
+  }
+  if (!process.env.MONGODB_URI) {
+    logger.warn(`Missing env variable MONGODB_URI`);
+  }
+  close();
+}
+
 mongoose.connect(process.env.MONGODB_URI).then(() => {
   const store = new MongoStore({ mongoose: mongoose });
   const wwebVersion = '2.2412.54';
