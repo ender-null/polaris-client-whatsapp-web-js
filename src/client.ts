@@ -39,7 +39,6 @@ if (!process.env.SERVER || !process.env.MONGODB_URI || !process.env.CONFIG) {
 
 mongoose.connect(process.env.MONGODB_URI).then(() => {
   const store = new MongoStore({ mongoose: mongoose });
-  const wwebVersion = '2.2412.54';
   const client = new Client({
     authStrategy: new RemoteAuth({
       store: store,
@@ -48,10 +47,6 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
     puppeteer: {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--unhandled-rejections=strict'],
-    },
-    webVersionCache: {
-      type: 'remote',
-      remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${wwebVersion}.html`,
     },
   });
 
