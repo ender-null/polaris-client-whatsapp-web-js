@@ -1,4 +1,4 @@
-FROM node:latest as builder
+FROM node:slim as builder
 
 RUN mkdir -p /usr/src/app
 
@@ -11,9 +11,9 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn run build
+RUN yarn build
 
-FROM node:latest as release
+FROM node:slim as release
 
 LABEL org.opencontainers.image.source https://github.com/ender-null/polaris-client-whatsapp-web-js
 
