@@ -71,7 +71,7 @@ export class Bot {
       content = msg.body;
       type = 'text';
       if (msg.mentionedIds.length) {
-        extra.mentions = msg.mentionedIds.map((mention) => mention.user);
+        extra.mentions = msg.mentionedIds.map((mention) => mention);
       }
     } else if (msg.type === MessageTypes.IMAGE) {
       const media = await msg.downloadMedia();
