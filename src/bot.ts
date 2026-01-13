@@ -117,7 +117,7 @@ export class Bot {
   formatChatId(conversationId: number | string) {
     return String(conversationId).startsWith('-')
       ? `${String(conversationId).slice(1)}@g.us`
-      : `${conversationId}@c.us`;
+      : `${conversationId}@lid`;
   }
 
   async sendChatAction(conversationId: number | string, type = 'text'): Promise<void> {
@@ -165,7 +165,7 @@ export class Bot {
       text = text.trim();
       const result = text.matchAll(/@\d+/gim);
       const mentionsFound = [...result][0];
-      const mentions: any[] = mentionsFound?.map((mention) => `${mention.slice(1)}@c.us`);
+      const mentions: any[] = mentionsFound?.map((mention) => `${mention.slice(1)}@lid`);
       this.client.sendMessage(chatId, text, {
         linkPreview: preview,
         mentions: mentions,
